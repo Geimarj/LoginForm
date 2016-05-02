@@ -10,6 +10,7 @@ import App from './App'
 import Register from './Register'
 import '../styles/app.css'
 import '../styles/bootstrap.css'
+import '../styles/register.css'
 
 const Components=(
     <Router history={hashHistory}>
