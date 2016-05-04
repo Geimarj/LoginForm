@@ -52,7 +52,7 @@ export default  class App extends React.Component{
          
         <div className="btncontainer">
         <ButtonGroup>
-         <Button bsStyle="primary" type="submit">Login</Button>
+         <Button bsStyle="success" type="submit">Login</Button>
           <Button bsStyle="info" type="button"
           onClick={this.goToRegister.bind(this)}>Register</Button>
           </ButtonGroup>
