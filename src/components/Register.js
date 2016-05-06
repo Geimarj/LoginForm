@@ -9,18 +9,99 @@ import {Well,
     Button,
     ButtonGroup
   } from 'react-bootstrap'
-
-export default  class Register extends React.Component{
+  import validation from 'react-validation-mixin'
+  import strategy from 'react-validatorjs-strategy'
+  import validatorjs from 'validatorjs'
+  import classnames from 'classnames'
+  
+  class Register extends React.Component{
+  
    constructor(props){
      super(props);
      this.state={
        
      };
+     
+     this.validatorTypes=strategy.createSchema(
+       {
+         lastName:'required',
+         firstName:'required',
+         gender:'required',
+         status:'required',
+         location:'required'
+       },
+       {
+         "required":"The field :attribute is required!"
+       },
+       (validation)=>{
+         validation.setAttributeNames({
+           lastName:'Lastname',
+           firstName:'Firstname',
+           gender:'gender',
+           status:'status',
+           location:'location'
+         });
+       }
+     );
+     
  }
+ 
+ getValidatorData = ()=> {
+        return this.state
+    };
+ 
+getClasses = (field)=>{
+  
+        return classnames({
+            'success': this.props.isValid(field),
+            'error': !this.props.isValid(field)
+        });
+ };
+ 
+ 
+getErrorText=(field)=>{
+        var error = this.props.errors[field];
+        if(!error)
+            return null;
+        if(Array.isArray(error)){
+            var message = [];
+            message = error.map((item,i)=>{
+                return(
+                    <span key={i}>
+                        {item}
+                        <br/>
+                    </span>
+                )
+            });
+            return message;
+        }
+        else
+            return  (<span>{error || ''}</span>);
+    };
+    
+     onFormSubmit = (event)=>{
+        event.preventDefault();
+        
+        this.setState({
+          validated:true
+        });
+        
+        this.props.validate(this.onValidate);
+    };
+ 
+     onValidate=(error)=>{
+        if (error) {
+            //form has errors; do not submit
+        } else {
+           // submit to rest here
+        }
+    };
+    
+    
   render(){
       const wellStyle={
          width:400,
-         height:650,
+         height:700,
          marginLeft:'auto',
          marginTop:'10px',
          marginRight:'auto'
@@ -29,15 +110,23 @@ export default  class Register extends React.Component{
          <div classname="container">
          <Well style={wellStyle}>
          <legend>Please Register</legend>
-         { JSON.stringify(this.state)}
          
-         <form>
-         <FormGroup>
+         <form onSubmit={this.onFormSubmit}>
+         
+         <FormGroup validationState={this.getClasses('firstName')}>
          <ControlLabel>First Name</ControlLabel>
          <FormControl
          type="text"
+         name="firstName"
          placeholder="Enter your first name"
          value={this.state.firstName || ''}
+         onBlur={()=>{
+           this.setState({
+             validated:true
+           });
+           this.props.validate('firstName');
+          }
+         }
          onChange={
            (e)=>this.setState({
                 firstName:e.target.value
@@ -45,15 +134,20 @@ export default  class Register extends React.Component{
         }
          />
          <FormControl.Feedback/>
-         <HelpBlock></HelpBlock>
+         <HelpBlock>{this.getErrorText('firstName')}</HelpBlock>
          </FormGroup>
          
-         <FormGroup>
+         <FormGroup validationState={this.getClasses('lastName')}>
          <ControlLabel>Last Name</ControlLabel>
          <FormControl
          type="text"
+         name="lastName"
          placeholder="Enter your last name"
          value={this.state.lastName || ''}
+         onBlur={()=>{
+           this.props.validate('lastName');
+          }
+         }
          onChange={
            (e)=>this.setState({
                 lastName:e.target.value
@@ -61,13 +155,19 @@ export default  class Register extends React.Component{
          }
          />
          <FormControl.Feedback/>
-         <HelpBlock></HelpBlock>
+         <HelpBlock>{this.getErrorText('lastName')}</HelpBlock>
          </FormGroup>
          
          
          <ControlLabel>Gender</ControlLabel>
-         <FormGroup>
+         <FormGroup validationState={this.getClasses('gender')}>
      <Radio  inline name="gender" value="Male"
+     name="gender"
+     onBlur={()=>{
+  
+           this.props.validate('gender');
+          }
+         }
      checked={this.state.gender === 'Male'}
      onClick={
        ()=>{
@@ -76,18 +176,32 @@ export default  class Register extends React.Component{
       }
       >Male</Radio>
       <Radio inline name="gender" value="Female"
+      name="gender"
+      onBlur={()=>{
+
+           this.props.validate('gender');
+          }
+         }
        checked={this.state.gender === 'Female'}
      onClick={
        ()=>{
            this.setState({'gender':'Female'})
        }
       }>Female</Radio>
+       <FormControl.Feedback/>
+         <HelpBlock>{this.getErrorText('gender')}</HelpBlock>
+ 
          </FormGroup>
-         
           
          <ControlLabel>Status</ControlLabel>
-          <FormGroup>
+          <FormGroup validationState={this.getClasses('status')}>
       <Radio inline name="status" value="Single"
+      name="status"
+      onBlur={()=>{
+
+           this.props.validate('status');
+          }
+         }
            checked={this.state.status === 'Single'}
      onClick={
        ()=>{
@@ -97,6 +211,12 @@ export default  class Register extends React.Component{
      >Single</Radio>
      
       <Radio inline name="status" value="Married"
+      name="status"
+      onBlur={()=>{
+
+           this.props.validate('status');
+          }
+         }
           checked={this.state.status === 'Married'}
      onClick={
        ()=>{
@@ -105,12 +225,20 @@ export default  class Register extends React.Component{
      }>Married</Radio>
      
       <Radio inline name="status" value="Widowed"
+      name="status"
+      onBlur={()=>{
+
+           this.props.validate('status');
+          }
+         }
           checked={this.state.status === 'Widowed'}
      onClick={
        ()=>{
            this.setState({'status':'Widowed'})
        }
      }>Widowed</Radio>
+     <FormControl.Feedback/>
+         <HelpBlock>{this.getErrorText('status')}</HelpBlock>
       </FormGroup>
       
          <ControlLabel>Favorite Movie/s</ControlLabel>
@@ -138,10 +266,16 @@ export default  class Register extends React.Component{
      }>Civil War</Checkbox>
 </FormGroup>
 
-      <FormGroup controlId="formControlsSelect">
+      <FormGroup controlId="formControlsSelect" validationState={this.getClasses('location')}>
         <ControlLabel>Location</ControlLabel>
         <FormControl componentClass="select" placeholder="select"
+        name="location"
         value={this.state.location}
+        onBlur={()=>{
+
+           this.props.validate('location');
+          }
+         }
         onChange={
           (e)=>this.setState({
             location:e.target.value
@@ -178,11 +312,19 @@ export default  class Register extends React.Component{
          <option value="Ubay">Ubay</option>
          <option value="Valencia">Valencia</option>
         </FormControl>
+        <FormControl.Feedback/>
+         <HelpBlock>{this.getErrorText('location')}</HelpBlock>
         </FormGroup>
         
          <FormGroup controlId="formControlsTextarea">
            <ControlLabel>Comment</ControlLabel>
-           <FormControl componentClass="textarea" placeholder="Comment" />
+           <FormControl componentClass="textarea" placeholder="Comment"
+            value={this.state.comment || ''}
+         onChange={
+           (e)=>this.setState({
+                comment:e.target.value
+         })
+         } />
          </FormGroup>
           
           <div className="button">
@@ -198,3 +340,5 @@ export default  class Register extends React.Component{
        );
   }   
 }
+
+export default validation(strategy)(Register);
