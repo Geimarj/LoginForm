@@ -19,7 +19,7 @@ export default  class App extends React.Component{
  
  render(){
      const wellStyle={
-         width:400,
+         width:500,
          height:500,
          marginLeft:'auto',
          marginTop:'10px',

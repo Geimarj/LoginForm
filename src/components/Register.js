@@ -28,7 +28,8 @@ import {Well,
          firstName:'required',
          gender:'required',
          status:'required',
-         location:'required'
+         location:'required',
+         comment:'required'
        },
        {
          "required":"The field :attribute is required!"
@@ -37,9 +38,10 @@ import {Well,
          validation.setAttributeNames({
            lastName:'Lastname',
            firstName:'Firstname',
-           gender:'gender',
-           status:'status',
-           location:'location'
+           gender:'Gender',
+           status:'Status',
+           location:'Location',
+           comment:'Comment'
          });
        }
      );
@@ -100,7 +102,7 @@ getErrorText=(field)=>{
     
   render(){
       const wellStyle={
-         width:400,
+         width:500,
          height:700,
          marginLeft:'auto',
          marginTop:'10px',
@@ -316,15 +318,23 @@ getErrorText=(field)=>{
          <HelpBlock>{this.getErrorText('location')}</HelpBlock>
         </FormGroup>
         
-         <FormGroup controlId="formControlsTextarea">
+         <FormGroup controlId="formControlsTextarea" validationState={this.getClasses('comment')}>
            <ControlLabel>Comment</ControlLabel>
            <FormControl componentClass="textarea" placeholder="Comment"
+           name="comment"
+           onBlur={()=>{
+
+           this.props.validate('comment');
+          }
+         }
             value={this.state.comment || ''}
          onChange={
            (e)=>this.setState({
                 comment:e.target.value
          })
          } />
+         <FormControl.Feedback/>
+         <HelpBlock>{this.getErrorText('comment')}</HelpBlock>
          </FormGroup>
           
           <div className="button">
