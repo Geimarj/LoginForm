@@ -19,7 +19,7 @@ import {Well,
    constructor(props){
      super(props);
      this.state={
-       
+       movie:{}
      };
      
      this.validatorTypes=strategy.createSchema(
@@ -29,19 +29,33 @@ import {Well,
          gender:'required',
          status:'required',
          location:'required',
-         comment:'required'
+         comment:'required',
+         movie:'required|moviesrule'
        },
        {
          "required":"The field :attribute is required!"
        },
-       (validation)=>{
-         validation.setAttributeNames({
+       (validator)=>{
+         validator.setAttributeNames({
            lastName:'Lastname',
            firstName:'Firstname',
            gender:'Gender',
            status:'Status',
            location:'Location',
            comment:'Comment'
+         });
+         
+         validator.constructor.registerAsync('moviesrule',
+         function(movie,attribute,req,passes){
+           var counter=0;
+           for(var key in movie){
+             if(movie[key])
+             counter++;
+           }
+           if(counter==0)
+           passes(false,'Please select one movie');
+           else
+           passes();
          });
        }
      );
@@ -244,28 +258,38 @@ getErrorText=(field)=>{
       </FormGroup>
       
          <ControlLabel>Favorite Movie/s</ControlLabel>
-          <FormGroup>
-      <Checkbox inline name="movie" value="Jungle Book"
-      checked={this.state.movie1 === 'Jungle Book'}
+          <FormGroup validationState={this.getClasses('movie')}>
+      <Checkbox inline checked={this.state.movie['Jungle Book']===1}
      onClick={
        ()=>{
-         if(this.state.movie1 === 'Jungle Book')
-           this.setState({'movie1':''})
+         var movie=this.state.movie;
+         if(movie['Jungle Book']===1)
+           movie['Jungle Book']=undefined;
            else
-           this.setState({'movie1':'Jungle Book'})
+           movie['Jungle Book']=1;
+           
+           this.setState({
+             movie:movie
+           });
        }
      }>Jungle Book</Checkbox>
      
-  <Checkbox inline name="movie" value="Civil War"
-   checked={this.state.movie2 === 'Civil War'}
+  <Checkbox inline checked={this.state.movie['Civil War']===1}
      onClick={
        ()=>{
-          if(this.state.movie2 === 'Civil War')
-           this.setState({'movie2':''})
+          var movie=this.state.movie;
+         if(movie['Civil War']===1)
+           movie['Civil War']=undefined;
            else
-           this.setState({'movie2':'Civil War'})
+           movie['Civil War']=1;
+           
+           this.setState({
+             movie:movie
+           });
        }
      }>Civil War</Checkbox>
+     <FormControl.Feedback/>
+     <HelpBlock>{this.getErrorText('movie')}</HelpBlock>
 </FormGroup>
 
       <FormGroup controlId="formControlsSelect" validationState={this.getClasses('location')}>
